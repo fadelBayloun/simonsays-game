@@ -2,51 +2,49 @@ let green = document.getElementById("green");
 let red = document.getElementById("red");
 let blue = document.getElementById("blue");
 let yellow = document.getElementById("yellow");
+let colors = [green, red, blue, yellow];
 let gameStarted = false;
 let level;
 
-// startin the game
+// starting the game
 
 document.addEventListener("keydown", (event) => {
   if (!gameStarted) startGame();
 });
 
-function startGame() {
+async function processStep(step) {
+  step.classList.add("pressed");
+  await new Promise((resolve) => setTimeout(resolve, 800));
+  step.classList.remove("pressed");
+}
+
+async function startGame() {
   gameStarted = true;
   level = 1;
-  let sequence = [];
   let answers = [];
+  let random = Math.floor(Math.random() * 4);
+  sequence += colors[random];
+  for (let i = 0; i < sequence.length; i++) {
+    await processStep(sequence[i]);
+  }
 }
 
 // adding press effect for colors
 
-function pressEffect(color) {
-  color.classList.toggle("pressed");
+function colorEvent(color, eventType) {
+  if (eventType === "mousedown") {
+    color.classList.add("pressed");
+  } else if (eventType === "mouseup") {
+    color.classList.remove("pressed");
+  }
 }
-green.addEventListener("mousedown", () => {
-  pressEffect(green);
-});
-green.addEventListener("mouseup", () => {
-  pressEffect(green);
-});
 
-red.addEventListener("mousedown", () => {
-  pressEffect(red);
-});
-red.addEventListener("mouseup", () => {
-  pressEffect(red);
-});
+for (const color of colors) {
+  color.addEventListener("mousedown", (event) => {
+    colorEvent(color, event.type);
+  });
 
-blue.addEventListener("mousedown", () => {
-  pressEffect(blue);
-});
-blue.addEventListener("mouseup", () => {
-  pressEffect(blue);
-});
-
-yellow.addEventListener("mousedown", () => {
-  pressEffect(yellow);
-});
-yellow.addEventListener("mouseup", () => {
-  pressEffect(yellow);
-});
+  color.addEventListener("mouseup", (event) => {
+    colorEvent(color, event.type);
+  });
+}
