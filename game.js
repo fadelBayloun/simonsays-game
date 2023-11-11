@@ -9,6 +9,7 @@ let gameStarted = false;
 let level, random, isCorrect;
 let playerInput = [];
 let sequence = [];
+let clickedCount = 0;
 
 // starting the game
 
@@ -18,53 +19,53 @@ document.addEventListener("keydown", (event) => {
 
 function startGame() {
   gameStarted = true;
-  playerInput = [];
   sequence = [];
   level = 1;
+  document.body.style = "";
   startNewRound();
 }
 
 function startNewRound() {
+  playerInput = [];
+  clickedCount = 0;
   title.innerHTML = `Level ${level}`;
   generateSequence();
-  colorEvent(sequence[sequence.length - 1], "mousedown");
-  setTimeout(() => {
-    colorEvent(sequence[sequence.length - 1], "mouseup");
-  }, 500);
+  addAnimation(sequence[sequence.length - 1]);
   for (const color of colors) {
     color.onclick = (event) => {
       playerInput.push(color);
-      isCorrect = handlePlayerInput();
+      clickedCount++;
+      addAnimation(color);
+      handlePlayerInput();
     };
-    if (!isCorrect) {
-      gameOver();
-    } else if (playerInput.length === sequence.length) {
-      level++;
-      startNewRound();
-    }
   }
 }
 
 function gameOver() {
-  title.innerHTML = `GameOver!`;
+  title.innerHTML = `Game Over! Press Any Key to Restart`;
   gameStarted = false;
+  document.body.style = "background-color : red;";
+  setTimeout(() => {
+    document.body.style = "";
+  }, 200);
+  addAudio("./sounds/wrong.mp3");
 }
 
 function handlePlayerInput() {
   if (playerInput.length > sequence.length) {
     return false;
   }
-  if (playerInput.length === sequence.length) {
-    for (let i = 0; i < playerInput.length; i++) {
-      if (playerInput[i] !== sequence[i]) {
-        return false;
-      }
+  for (let i = 0; i < playerInput.length; i++) {
+    if (playerInput[i].id !== sequence[i].id) {
+      gameOver();
     }
-    // Player completed the sequence correctly
-    return true;
   }
-  // Player's input is shorter than the correct sequence, continue!
-  return true;
+  if (clickedCount === level && gameStarted) {
+    setTimeout(() => {
+      level++;
+      startNewRound();
+    }, 500);
+  }
 }
 
 function generateSequence() {
@@ -72,22 +73,16 @@ function generateSequence() {
   sequence.push(colors[random]);
 }
 
-// adding press effect for colors
+function addAnimation(color) {
+  color.classList.remove("color-animation");
+  setTimeout(() => {
+    color.classList.add("color-animation");
+  }, 10);
 
-function colorEvent(color, eventType) {
-  if (eventType === "mousedown") {
-    color.classList.add("pressed");
-  } else if (eventType === "mouseup") {
-    color.classList.remove("pressed");
-  }
+  addAudio("./sounds/" + color.id + ".mp3");
 }
 
-for (const color of colors) {
-  color.addEventListener("mousedown", (event) => {
-    colorEvent(color, event.type);
-  });
-
-  color.addEventListener("mouseup", (event) => {
-    colorEvent(color, event.type);
-  });
+function addAudio(path) {
+  const audio = new Audio(path);
+  audio.play();
 }
