@@ -1,15 +1,15 @@
-let green = document.getElementById("green");
-let red = document.getElementById("red");
-let blue = document.getElementById("blue");
-let yellow = document.getElementById("yellow");
 let title = document.getElementById("level-title");
+let yellow = document.getElementById("yellow");
+let green = document.getElementById("green");
+let blue = document.getElementById("blue");
+let red = document.getElementById("red");
 
 let colors = [green, red, blue, yellow];
-let gameStarted = false;
 let level, random, isCorrect;
+let gameStarted = false;
+let clickedCount = 0;
 let playerInput = [];
 let sequence = [];
-let clickedCount = 0;
 
 // starting the game
 
@@ -21,7 +21,6 @@ function startGame() {
   gameStarted = true;
   sequence = [];
   level = 1;
-  document.body.style = "";
   startNewRound();
 }
 
@@ -38,33 +37,6 @@ function startNewRound() {
       addAnimation(color);
       handlePlayerInput();
     };
-  }
-}
-
-function gameOver() {
-  title.innerHTML = `Game Over! Press Any Key to Restart`;
-  gameStarted = false;
-  document.body.style = "background-color : red;";
-  setTimeout(() => {
-    document.body.style = "";
-  }, 200);
-  addAudio("./sounds/wrong.mp3");
-}
-
-function handlePlayerInput() {
-  if (playerInput.length > sequence.length) {
-    return false;
-  }
-  for (let i = 0; i < playerInput.length; i++) {
-    if (playerInput[i].id !== sequence[i].id) {
-      gameOver();
-    }
-  }
-  if (clickedCount === level && gameStarted) {
-    setTimeout(() => {
-      level++;
-      startNewRound();
-    }, 500);
   }
 }
 
@@ -85,4 +57,31 @@ function addAnimation(color) {
 function addAudio(path) {
   const audio = new Audio(path);
   audio.play();
+}
+
+function handlePlayerInput() {
+  if (playerInput.length > sequence.length) {
+    gameOver();
+  }
+  for (let i = 0; i < playerInput.length; i++) {
+    if (playerInput[i].id !== sequence[i].id) {
+      gameOver();
+    }
+  }
+  if (clickedCount === level && gameStarted) {
+    setTimeout(() => {
+      level++;
+      startNewRound();
+    }, 500);
+  }
+}
+
+function gameOver() {
+  title.innerHTML = `Game Over! Press Any Key to Restart`;
+  gameStarted = false;
+  document.body.style = "background-color : red;";
+  setTimeout(() => {
+    document.body.style = "";
+  }, 200);
+  addAudio("./sounds/wrong.mp3");
 }
